@@ -3,10 +3,12 @@
 https://docs.isaacsim.omniverse.nvidia.com/5.1.0/installation/install_container.html
 
 
-
+# cli
 docker exec -it isaac-sim bash
 mkdir -p /isaac-sim/exts/isaacsim.asset.browser/cache
 
+## root connection
+docker exec -u 0 -it isaac-sim bash
 
 # launch
 xhost +local:
@@ -62,7 +64,7 @@ docker run --name isaac-sim --entrypoint bash -it --gpus all --rm --network=host
 
 
 xhost +local:
-docker run --name isaac-sim --entrypoint bash -it --gpus all --rm --network=host \
+docker run --name isaac-sim --entrypoint bash -it --gpus all --network=host \
     --shm-size=32gb \
     -e "ACCEPT_EULA=Y" \
     -e "PRIVACY_CONSENT=Y" \
