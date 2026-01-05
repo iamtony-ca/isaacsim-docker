@@ -1,8 +1,11 @@
-# isaacsim-docker
-
 
 # installation
 https://docs.isaacsim.omniverse.nvidia.com/5.1.0/installation/install_container.html
+
+
+
+docker exec -it isaac-sim bash
+mkdir -p /isaac-sim/exts/isaacsim.asset.browser/cache
 
 
 # launch
@@ -56,6 +59,23 @@ docker run --name isaac-sim --entrypoint bash -it --gpus all --rm --network=host
     -v ~/docker/isaac-sim/pkg:/root/.local/share/ov/pkg:rw \
     nvcr.io/nvidia/isaac-sim:5.1.0
 
+
+
+xhost +local:
+docker run --name isaac-sim --entrypoint bash -it --gpus all --rm --network=host \
+    --shm-size=32gb \
+    -e "ACCEPT_EULA=Y" \
+    -e "PRIVACY_CONSENT=Y" \
+    -e "NVIDIA_DRIVER_CAPABILITIES=all" \
+    -e DISPLAY \
+    -v $HOME/.Xauthority:/root/.Xauthority:rw \
+    -v ~/docker/isaac-sim/cache/main:/root/.cache/ov:rw \
+    -v ~/docker/isaac-sim/cache/computecache:/root/.nv/ComputeCache:rw \
+    -v ~/docker/isaac-sim/logs:/root/.nvidia-omniverse/logs:rw \
+    -v ~/docker/isaac-sim/config:/root/.nvidia-omniverse/config:rw \
+    -v ~/docker/isaac-sim/data:/root/.local/share/ov/data:rw \
+    -v ~/docker/isaac-sim/pkg:/root/.local/share/ov/pkg:rw \
+    nvcr.io/nvidia/isaac-sim:5.1.0
 
 
 
