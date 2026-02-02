@@ -80,5 +80,11 @@ docker run --name isaac-sim --entrypoint bash -it --gpus all --network=host \
     nvcr.io/nvidia/isaac-sim:5.1.0
 
 
+# root 권한 필요시.
+docker exec -it -u 0 isaac-sim bash
+
+
+# standalone python script 실행시 
+./python.sh
 
 ./runapp.sh
