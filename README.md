@@ -91,7 +91,7 @@ docker exec -it -u 0 isaac-sim bash
 
 
 
-
+```
 # 6.0.1
 # 1) 6.0.1 전용 볼륨 마운트 디렉토리 (5.1.0과 분리)
 mkdir -p ~/docker/isaac-sim-6.0.1/cache/main
@@ -143,6 +143,8 @@ docker run --name isaac-sim-601 --entrypoint bash -it --gpus all -e "ACCEPT_EULA
     -v ~/.cache/ov/hub-6.0.1:/var/cache/hub:rw \
     -u 1234:1234 \
     nvcr.io/nvidia/isaac-sim:6.0.1
+
+```
 
 
 # root 권한 필요시.
