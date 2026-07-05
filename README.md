@@ -133,6 +133,29 @@ docker run --name isaac-sim-601 --entrypoint bash -it --gpus all -e "ACCEPT_EULA
     -u 1234:1234 \
     nvcr.io/nvidia/isaac-sim:6.0.1
 
+
+### 
+xhost +local:
+docker run --name isaac-sim-601 --entrypoint bash -it --gpus all -e "ACCEPT_EULA=Y" --network=host \
+    -e "PRIVACY_CONSENT=Y" \
+    -v ~/docker/isaac-sim-6.0.1/cache/main:/isaac-sim/.cache:rw \
+    -v ~/docker/isaac-sim-6.0.1/cache/computecache:/isaac-sim/.nv/ComputeCache:rw \
+    -v ~/docker/isaac-sim-6.0.1/logs:/isaac-sim/.nvidia-omniverse/logs:rw \
+    -v ~/docker/isaac-sim-6.0.1/config:/isaac-sim/.nvidia-omniverse/config:rw \
+    -v ~/docker/isaac-sim-6.0.1/data:/isaac-sim/.local/share/ov/data:rw \
+    -v ~/docker/isaac-sim-6.0.1/pkg:/isaac-sim/.local/share/ov/pkg:rw \
+    -v ~/docker/isaac-sim-6.0.1/volume:/isaac-sim/volume:rw \
+    -v ~/.cache/ov/hub-6.0.1:/var/cache/hub:rw \
+    -u 1234:1234 \
+    nvcr.io/nvidia/isaac-sim:6.0.1
+
+
+### root 에서 파일 생성 등으로 권한 문제시
+sudo chown $(id -u):$(id -u) ~/docker/isaac-sim-6.0.1/volume/그_파일
+# 또는 volume 전체 ACL 재적용
+sudo setfacl -R -m u:$(id -u):rwx -m u:1234:rwx -m m:rwx ~/docker/isaac-sim-6.0.1/volume
+
+
 ```
 
 
