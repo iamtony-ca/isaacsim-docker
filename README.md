@@ -81,84 +81,58 @@ docker run --name isaac-sim --entrypoint bash -it --gpus all --network=host \
 
 
 ```
-# 6.0.1
-# 1) 6.0.1 전용 볼륨 마운트 디렉토리 (5.1.0과 분리)
-mkdir -p ~/docker/isaac-sim-6.0.1/cache/main
-mkdir -p ~/docker/isaac-sim-6.0.1/cache/computecache
-mkdir -p ~/docker/isaac-sim-6.0.1/config
-mkdir -p ~/docker/isaac-sim-6.0.1/data
-mkdir -p ~/docker/isaac-sim-6.0.1/logs
-mkdir -p ~/docker/isaac-sim-6.0.1/pkg
-mkdir -p ~/docker/isaac-sim-6.0.1/volume
-mkdir -p ~/.cache/ov/hub-6.0.1
-sudo chown -R 1234:1234 ~/docker/isaac-sim-6.0.1 ~/.cache/ov/hub-6.0.1
+# 공식 docs 원본 디렉토리
+mkdir -p ~/docker/isaac-sim-601/cache/main
+mkdir -p ~/docker/isaac-sim-601/cache/computecache
+mkdir -p ~/docker/isaac-sim-601/config
+mkdir -p ~/docker/isaac-sim-601/data
+mkdir -p ~/docker/isaac-sim-601/logs
+mkdir -p ~/docker/isaac-sim-601/pkg
+mkdir -p ~/.cache/ov/hub
+
+# 공유 폴더 추가
+mkdir -p ~/docker/isaac-sim-601/volume
+
+sudo chown -R 1234:1234 ~/docker/isaac-sim-601 ~/.cache/ov/hub
+
+# 공유 폴더: host(user)와 container(1234) 양방향 편집 가능하게 ACL
+MYUID=$(id -u)   # host user = 1000
+sudo setfacl -R    -m u:$MYUID:rwx -m u:1234:rwx -m m:rwx ~/docker/isaac-sim-601/volume
+sudo setfacl -R -d -m u:$MYUID:rwx -m u:1234:rwx -m m:rwx ~/docker/isaac-sim-601/volume
 
 
 
-
-# 
-BASE=~/docker/isaac-sim-6.0.1
-MYUID=$(id -u)          # tony, 아마 1000
-# 기존 파일: tony 접근 허용
-sudo setfacl -R -m u:$MYUID:rwx $BASE ~/.cache/ov/hub-6.0.1
-
-# 앞으로 생길 파일: 양방향 상속(default ACL)
-#  - 컨테이너(1234)가 만든 파일 → tony가 편집 가능
-#  - tony가 만든 파일 → 컨테이너(1234)가 편집 가능
-sudo setfacl -R -d -m u:$MYUID:rwx -m u:1234:rwx $BASE ~/.cache/ov/hub-6.0.1
-
-
-BASE=~/docker/isaac-sim-6.0.1
-MYUID=$(id -u)
-
-# 기존 파일: tony + 1234 둘 다 rwx, 그리고 mask를 rwx로 (effective 깎임 방지)
-sudo setfacl -R -m u:$MYUID:rwx -m u:1234:rwx -m m:rwx $BASE/volume
-
-# 미래 파일: default ACL도 동일하게 + default mask rwx
-sudo setfacl -R -d -m u:$MYUID:rwx -m u:1234:rwx -m m:rwx $BASE/volume
-
-
-
-# 2) headless + livestream 실행
-docker run --name isaac-sim-601 --entrypoint bash -it --gpus all -e "ACCEPT_EULA=Y" --rm --network=host \
-    -e "PRIVACY_CONSENT=Y" \
-    -v ~/docker/isaac-sim-6.0.1/cache/main:/isaac-sim/.cache:rw \
-    -v ~/docker/isaac-sim-6.0.1/cache/computecache:/isaac-sim/.nv/ComputeCache:rw \
-    -v ~/docker/isaac-sim-6.0.1/logs:/isaac-sim/.nvidia-omniverse/logs:rw \
-    -v ~/docker/isaac-sim-6.0.1/config:/isaac-sim/.nvidia-omniverse/config:rw \
-    -v ~/docker/isaac-sim-6.0.1/data:/isaac-sim/.local/share/ov/data:rw \
-    -v ~/docker/isaac-sim-6.0.1/pkg:/isaac-sim/.local/share/ov/pkg:rw \
-    -v ~/docker/isaac-sim-6.0.1/volume:/isaac-sim/volume:rw \
-    -v ~/.cache/ov/hub-6.0.1:/var/cache/hub:rw \
-    -u 1234:1234 \
-    nvcr.io/nvidia/isaac-sim:6.0.1
-
-
-### 
+# container 생성
 xhost +local:
 docker run --name isaac-sim-601 --entrypoint bash -it --gpus all -e "ACCEPT_EULA=Y" --network=host \
     -e "PRIVACY_CONSENT=Y" \
+    -v $HOME/.Xauthority:/isaac-sim/.Xauthority \
     -e DISPLAY \
-    -e XAUTHORITY=/isaac-sim/.Xauthority \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-    -v $HOME/.Xauthority:/isaac-sim/.Xauthority:ro \
-    -v ~/docker/isaac-sim-6.0.1/cache/main:/isaac-sim/.cache:rw \
-    -v ~/docker/isaac-sim-6.0.1/cache/computecache:/isaac-sim/.nv/ComputeCache:rw \
-    -v ~/docker/isaac-sim-6.0.1/logs:/isaac-sim/.nvidia-omniverse/logs:rw \
-    -v ~/docker/isaac-sim-6.0.1/config:/isaac-sim/.nvidia-omniverse/config:rw \
-    -v ~/docker/isaac-sim-6.0.1/data:/isaac-sim/.local/share/ov/data:rw \
-    -v ~/docker/isaac-sim-6.0.1/pkg:/isaac-sim/.local/share/ov/pkg:rw \
-    -v ~/docker/isaac-sim-6.0.1/volume:/isaac-sim/volume:rw \
-    -v ~/.cache/ov/hub-6.0.1:/var/cache/hub:rw \
+    -v ~/docker/isaac-sim-601/cache/main:/isaac-sim/.cache:rw \
+    -v ~/docker/isaac-sim-601/cache/computecache:/isaac-sim/.nv/ComputeCache:rw \
+    -v ~/docker/isaac-sim-601/logs:/isaac-sim/.nvidia-omniverse/logs:rw \
+    -v ~/docker/isaac-sim-601/config:/isaac-sim/.nvidia-omniverse/config:rw \
+    -v ~/docker/isaac-sim-601/data:/isaac-sim/.local/share/ov/data:rw \
+    -v ~/docker/isaac-sim-601/pkg:/isaac-sim/.local/share/ov/pkg:rw \
+    -v ~/docker/isaac-sim-601/volume:/isaac-sim/volume:rw \
+    -v ~/.cache/ov/hub:/var/cache/hub:rw \
     -u 1234:1234 \
     nvcr.io/nvidia/isaac-sim:6.0.1
 
 
-### root 에서 파일 생성 등으로 권한 문제시
-sudo chown $(id -u):$(id -u) ~/docker/isaac-sim-6.0.1/volume/그_파일
-# 또는 volume 전체 ACL 재적용
-sudo setfacl -R -m u:$(id -u):rwx -m u:1234:rwx -m m:rwx ~/docker/isaac-sim-6.0.1/volume
+## root 진입
+docker exec -it -u 0 isaac-sim bash
 
+## root 셸에서 실행
+export HOME=/opt/claude
+mkdir -p /opt/claude
+curl -fsSL https://claude.ai/install.sh | bash
+chmod -R a+rX /opt/claude
+ln -sf /opt/claude/.local/bin/claude /usr/local/bin/claude
+
+## isaac-sim 계정에서 확인.
+which claude      # /usr/local/bin/claude
+claude --version
 
 ```
 
