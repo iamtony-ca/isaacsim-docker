@@ -138,6 +138,10 @@ docker run --name isaac-sim-601 --entrypoint bash -it --gpus all -e "ACCEPT_EULA
 xhost +local:
 docker run --name isaac-sim-601 --entrypoint bash -it --gpus all -e "ACCEPT_EULA=Y" --network=host \
     -e "PRIVACY_CONSENT=Y" \
+    -e DISPLAY \
+    -e XAUTHORITY=/isaac-sim/.Xauthority \
+    -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+    -v $HOME/.Xauthority:/isaac-sim/.Xauthority:ro \
     -v ~/docker/isaac-sim-6.0.1/cache/main:/isaac-sim/.cache:rw \
     -v ~/docker/isaac-sim-6.0.1/cache/computecache:/isaac-sim/.nv/ComputeCache:rw \
     -v ~/docker/isaac-sim-6.0.1/logs:/isaac-sim/.nvidia-omniverse/logs:rw \
